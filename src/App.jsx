@@ -1,35 +1,49 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import Description from "./components/Description/Description";
+import Options from "./components/Options/Options";
+import Feedback from "./components/Feedback/Feedback";
+import Notification from "./components/Notification/Notification";
+import { useState, useEffect } from "react";
 
-function App() {
-  const [count, setCount] = useState(0)
+const App = () => {
+  const initialState = { good: 0, neutral: 0, bad: 0 };
+  const [points, setPoints] = useState(() => {
+    const savedPoints = window.localStorage.getItem("points");
+    return savedPoints ? JSON.parse(savedPoints) : initialState;
+  });
+
+  useEffect(() => {
+    window.localStorage.setItem("points", JSON.stringify(points));
+  }, [points]);
+
+  const updateFeedback = (type) => {
+    if (type === "reset") {
+      setPoints({ good: 0, neutral: 0, bad: 0 });
+    }
+    setPoints((prev) => ({
+      ...prev,
+      [type]: prev[type] + 1,
+    }));
+  };
+
+  const totalFeedback = points.good + points.neutral + points.bad;
+
+  const positiveFeedback = Math.round((points.good / totalFeedback) * 100);
 
   return (
     <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+      <Description />
+      <Options updateFeedback={updateFeedback} totalFeedback={totalFeedback} />
+      {totalFeedback > 0 ? (
+        <Feedback
+          points={points}
+          totalFeedback={totalFeedback}
+          positiveFeedback={positiveFeedback}
+        />
+      ) : (
+        <Notification message="No feedback yet" />
+      )}
     </>
-  )
-}
+  );
+};
 
-export default App
+export default App;
