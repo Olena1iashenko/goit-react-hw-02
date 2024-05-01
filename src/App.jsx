@@ -18,8 +18,9 @@ const App = () => {
   const updateFeedback = (type) => {
     if (type === "reset") {
       setPoints({ good: 0, neutral: 0, bad: 0 });
+      return;
     }
-    return setPoints((prev) => ({
+    setPoints((prev) => ({
       ...prev,
       [type]: prev[type] + 1,
     }));
