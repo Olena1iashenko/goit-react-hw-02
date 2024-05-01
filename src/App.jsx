@@ -19,7 +19,7 @@ const App = () => {
     if (type === "reset") {
       setPoints({ good: 0, neutral: 0, bad: 0 });
     }
-    setPoints((prev) => ({
+    return setPoints((prev) => ({
       ...prev,
       [type]: prev[type] + 1,
     }));
